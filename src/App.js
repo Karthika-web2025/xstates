@@ -20,18 +20,28 @@ function App() {
   // Fetch states when country changes
 
   
-  useEffect(() => {
-    if (!country) return;
+ useEffect(() => {
+  if (!country) return;
 
-    setStates([]);
-    setState("");
-    setCities([]);
-    setCity("");
+  setStates([]);
+  setState("");
+  setCities([]);
+  setCity("");
 
-    fetch(`https://location-selector.labs.crio.do/country=${country}/states`)
-      .then(res => res.json())
-      .then(data => setStates(data || []));
-  }, [country]);
+  fetch(`https://location-selector.labs.crio.do/country=${country}/states`)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch states");
+      }
+      return res.json();
+    })
+    .then(data => setStates(data || []))
+    .catch(error => {
+      console.error("Error fetching states:", error);
+      setStates([]); 
+    });
+}, [country]);
+
 
   // Fetch cities when state changes
   useEffect(() => {
@@ -44,9 +54,19 @@ function App() {
       `https://location-selector.labs.crio.do/country=${country}/state=${state}/cities`
       
     )
-      .then(res => res.json())
-      .then(data => setCities(data));
+     .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch cities");
+      }
+      return res.json();
+    })
+      
+      .then(data => setCities(data))
+      .catch(error => {
+      console.error("Error fetching cities:", error);
       setCity("")
+    });
+     
   }, [country, state]);
 
   return (
