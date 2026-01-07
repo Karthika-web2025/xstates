@@ -13,8 +13,17 @@ function App() {
   // Fetch countries
   useEffect(() => {
     fetch("https://location-selector.labs.crio.do/countries")
-      .then(res => res.json())
-      .then(data => setCountries(data || []));
+      .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch countries");
+      }
+      return res.json();
+    })
+      .then(data => setCountries(data || []))
+      .catch(error => {
+      console.error("Error fetching countries:", error);
+      // setStates([]); 
+    });
   }, []);
 
   // Fetch states when country changes
